@@ -4,6 +4,7 @@ import MailBody from './MailBody';
 import { useDispatch, useSelector } from 'react-redux';
 import { markAsRead } from '@/redux/mailSlice';
 import { RootState } from '@/redux/store';
+import { motion } from 'framer-motion';
 
 interface Email {
     id: string;
@@ -61,20 +62,24 @@ const MailList = () => {
         const timeStr = dateObj.toLocaleTimeString(undefined, {
             hour: "2-digit", minute: "2-digit", hour12: true
         }).replace(' ', '').toLowerCase();
-        
+
         return `${day}/${month}/${year} ${timeStr}`;
-    }, []);    
+    }, []);
 
     const fetchEmailBody = useCallback(async (id: string) => {
         try {
             const res = await fetch(`https://flipkart-email-mock.now.sh/?id=${id}`);
             const { body } = await res.json();
             return body;
-        } catch (error: any) {
-            console.error(`Error while fetching the Email Body ${error?.message}`);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error(`Error while fetching the Email Body: ${error.message}`);
+            } else {
+                console.error("An unknown error occurred.");
+            }
             return 'Failed to load email body.';
         }
-    }, []);
+    }, []);    
 
     const handleEmailClick = useCallback(async (email: Email) => {
         dispatch(markAsRead(email.id));
@@ -131,13 +136,16 @@ const MailList = () => {
                     ) : (
                         <div className={`flex flex-col gap-3 xl:gap-5`}>
                             {currentEmails.map(email => (
-                                <div
+                                <motion.div
                                     key={email.id}
                                     className={`border-2 rounded-lg px-3 py-3 xl:px-5 flex gap-2 xl:gap-4 cursor-pointer
                                         ${readEmails.includes(email.id) ? 'bg-[#F2F2F2]' : 'bg-white'}
                                         ${selectedEmail?.id === email.id ? 'border-[#E54065]' : 'border-[#CFD2DC]'}`}
                                     onClick={() => handleEmailClick(email)}
-                                >
+                                    initial={{ opacity: 0, y: 50 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.8 }}>
                                     <span className="min-w-10 max-w-10 min-h-10 max-h-10 bg-[#E54065] text-white flex items-center justify-center rounded-full text-lg font-semibold">
                                         {email.from.name.charAt(0).toUpperCase()}
                                     </span>
@@ -154,7 +162,7 @@ const MailList = () => {
                                             )}
                                         </p>
                                     </div>
-                                </div>
+                                </motion.div>
                             ))}
                             {/* Pagination Controls */}
                             <div className="flex justify-center gap-2 mt-5">

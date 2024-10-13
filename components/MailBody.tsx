@@ -3,6 +3,7 @@ import React, { useMemo, useCallback } from 'react';
 import { markAsFavorite, unmarkAsFavorite } from '@/redux/mailSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { motion } from 'framer-motion';
 
 const convertBodyToParagraphs = (htmlString: string): string[] => {
     const tempDiv = document.createElement('div');
@@ -45,7 +46,11 @@ const MailBody: React.FC<MailBodyProps> = ({ data, unSelect }) => {
 
 
     return (
-        <section className={`bg-white border-2 rounded-lg p-4 xl:p-8 min-h-max h-[85vh] w-full xl:w-[65%] right-0 xl:right-10 xl:fixed`}>
+        <motion.section className={`bg-white border-2 rounded-lg p-4 xl:p-8 min-h-max h-[85vh] w-full xl:w-[65%] right-0 xl:right-10 xl:fixed`}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}>
             <span onClick={unSelect} className='block xl:hidden mb-2'>
                 <svg fill="#000000" width="25px" height="25px" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" id="arrow" transform="scale(-1, 1) translate(-15, 0)">
                     <path d="M8.29289 2.29289C8.68342 1.90237 9.31658 1.90237 9.70711 2.29289L14.2071 6.79289C14.5976 7.18342 14.5976 7.81658 14.2071 8.20711L9.70711 12.7071C9.31658 13.0976 8.68342 13.0976 8.29289 12.7071C7.90237 12.3166 7.90237 11.6834 8.29289 11.2929L11 8.5H1.5C0.947715 8.5 0.5 8.05228 0.5 7.5C0.5 6.94772 0.947715 6.5 1.5 6.5H11L8.29289 3.70711C7.90237 3.31658 7.90237 2.68342 8.29289 2.29289Z" />
@@ -74,7 +79,7 @@ const MailBody: React.FC<MailBodyProps> = ({ data, unSelect }) => {
                     </div>
                 </section>
             </article>
-        </section>
+        </motion.section>
     )
 }
 
